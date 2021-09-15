@@ -1,6 +1,6 @@
-import { Model } from 'mongoose'
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import { Model, Schema } from 'mongoose'
 
 import { User } from './user.model'
 import { CreateUserDto } from './user.dto'
@@ -11,7 +11,12 @@ export class UserService {
 
   async create(doc: CreateUserDto) {
     const result = await new this.userModel(doc).save()
-    return result.id
+    return result.id as string | Schema.Types.ObjectId
+  }
+
+  async delete(id: string | Schema.Types.ObjectId) {
+    const result = await this.userModel.deleteOne({ _id: id })
+    return result
   }
 
   async findByEmail(email: string) {
