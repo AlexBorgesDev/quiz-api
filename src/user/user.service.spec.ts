@@ -1,7 +1,9 @@
+import { Error } from 'mongoose'
+import { compareSync } from 'bcryptjs'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Test, TestingModule } from '@nestjs/testing'
 
-import { UserSchema } from './user.model'
+import { UserSchema } from './user.schema'
 import { UserService } from './user.service'
 
 describe('UserService', () => {
@@ -22,13 +24,14 @@ describe('UserService', () => {
 
   describe('#create', () => {
     it('should not create User with falsy params', async () => {
-      expect.assertions(4)
+      expect.assertions(5)
       try {
         await service.create(null)
       } catch (error) {
         error = error as Error
         expect(error.name).toEqual('ValidationError')
         expect(error.errors).not.toBeNull()
+        expect(error.errors.name).not.toBeNull()
         expect(error.errors.email).not.toBeNull()
         expect(error.errors.password).not.toBeNull()
       }
@@ -37,6 +40,12 @@ describe('UserService', () => {
     it('should create User', async () => {
       const user = await service.create(userDto)
       expect(user).not.toBeUndefined()
+    })
+
+    it('should crypt User password', async () => {
+      const user = await service.findByEmail(userDto.email)
+      expect(user).not.toBeNull()
+      expect(compareSync(userDto.password, user.password)).toBe(true)
     })
   })
 
