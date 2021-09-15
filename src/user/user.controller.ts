@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
 import { genSalt, hash } from 'bcryptjs'
 
-import { Public } from 'src/public.decorator'
+import { Public } from '../public.decorator'
 import { UserService } from './user.service'
 import { CreateUserDto } from './user.dto'
 
