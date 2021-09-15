@@ -1,5 +1,4 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
-import { genSalt, hash } from 'bcryptjs'
 
 import { Public } from '../public.decorator'
 import { UserService } from './user.service'
@@ -16,10 +15,7 @@ export class UserController {
 
     if (userAlreadyExists) throw new BadRequestException('User already exists')
 
-    const salt = await genSalt(10)
-    const passwordHash = await hash(user.password, salt)
-
-    await this.service.create({ ...user, password: passwordHash })
+    await this.service.create(user)
 
     return { message: 'User created successfully' }
   }
