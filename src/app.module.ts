@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
-import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 
 import { UserModule } from './user/user.module'
 import { AuthModule } from './auth/auth.module'
@@ -12,7 +12,13 @@ import { validationSchema } from './config/validation'
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validationSchema }),
-    MongooseModule.forRoot('mongodb://0.0.0.0/quiz'),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URL'),
+      }),
+    }),
     UserModule,
     AuthModule,
     QuizModule,
