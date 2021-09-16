@@ -27,8 +27,4 @@ export class CreateQuizDto {
   @IsInt()
   @IsPositive()
   correctAlternative: number
-
-  @IsMongoId()
-  @IsNotEmpty()
-  createdBy: string | Schema.Types.ObjectId
 }
