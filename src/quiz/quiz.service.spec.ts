@@ -53,7 +53,7 @@ describe('QuizService', () => {
   })
 
   describe('#create', () => {
-    it('should not create a quiz if the User does not exist', async () => {
+    it('should not create a Quiz if the User does not exist', async () => {
       expect.assertions(3)
       try {
         await service.create(quizDto)
