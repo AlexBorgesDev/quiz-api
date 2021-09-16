@@ -61,6 +61,15 @@ describe('UserService', () => {
     expect(user.email).toBe(user.email)
   })
 
+  it('should find User by id', async () => {
+    const user = await service.findByEmail(userDto.email)
+    expect(user).not.toBeNull()
+
+    const res = await service.findById(user._id)
+    expect(res).not.toBeNull()
+    expect(res.email).toBe(user.email)
+  })
+
   it('should delete User', async () => {
     const user = await service.findByEmail(userDto.email)
     expect(user).not.toBeNull()

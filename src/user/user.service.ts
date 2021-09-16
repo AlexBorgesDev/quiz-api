@@ -19,6 +19,11 @@ export class UserService {
     return result
   }
 
+  async findById(id: string | Schema.Types.ObjectId) {
+    const result = await this.userModel.findOne({ _id: id })
+    return result
+  }
+
   async findByEmail(email: string) {
     const result = await this.userModel.findOne({ email })
     return result
