@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 
 import { UserModule } from './user/user.module'
 import { AuthModule } from './auth/auth.module'
+import { QuizModule } from './quiz/quiz.module'
 import { JwtAuthGuard } from './auth/jwt.auth-guard'
 import { validationSchema } from './config/validation'
 
@@ -14,6 +15,7 @@ import { validationSchema } from './config/validation'
     MongooseModule.forRoot('mongodb://0.0.0.0/quiz'),
     UserModule,
     AuthModule,
+    QuizModule,
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
