@@ -55,6 +55,18 @@ describe('UserController (e2e)', () => {
         .expect(201)
         .expect({ message: 'User created successfully' })
     })
+
+    it('should not create User with email already in use', () => {
+      return request(app.getHttpServer())
+        .post('/user')
+        .send(userDto)
+        .expect(400)
+        .expect({
+          statusCode: 400,
+          message: 'User already exists',
+          error: 'Bad Request',
+        })
+    })
   })
 
   describe('/user (DELETE)', () => {
