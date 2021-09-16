@@ -1,4 +1,12 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  NotFoundException,
+  Post,
+  Request,
+} from '@nestjs/common'
 
 import { Public } from '../public.decorator'
 import { UserService } from './user.service'
@@ -18,5 +26,14 @@ export class UserController {
     await this.service.create(user)
 
     return { message: 'User created successfully' }
+  }
+
+  @Delete()
+  async delete(@Request() req: any) {
+    const result = await this.service.delete(req.user.id)
+
+    if (result.deletedCount === 0) throw new NotFoundException('User not found')
+
+    return { message: 'User deleted successfully' }
   }
 }
