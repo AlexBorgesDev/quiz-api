@@ -11,7 +11,7 @@ import { UserService } from '../user/user.service'
 import { JwtStrategy } from './jwt.strategy'
 import { AuthService } from './auth.service'
 import { AuthController } from './auth.controller'
-import { validationSchema } from '../config/validation'
+import { validationTestSchema as validationSchema } from '../config/validation-test'
 
 describe('AuthController', () => {
   let controller: AuthController
@@ -23,7 +23,13 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({ isGlobal: true, validationSchema }),
-        MongooseModule.forRoot('mongodb://0.0.0.0/quiz-test'),
+        MongooseModule.forRootAsync({
+          imports: [ConfigModule],
+          inject: [ConfigService],
+          useFactory: async (configService: ConfigService) => ({
+            uri: configService.get<string>('MONGO_URL_TEST'),
+          }),
+        }),
         UserModule,
         PassportModule,
         JwtModule.registerAsync({
