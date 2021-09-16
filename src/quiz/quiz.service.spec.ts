@@ -1,13 +1,24 @@
 import { Error, Types } from 'mongoose'
+import { internet, name } from 'faker'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Test, TestingModule } from '@nestjs/testing'
+import { UnauthorizedException } from '@nestjs/common'
 
 import { QuizSchema } from './quiz.schema'
 import { QuizService } from './quiz.service'
 import { UserSchema } from '../user/user.schema'
+import { UserModule } from '../user/user.module'
+import { UserService } from '../user/user.service'
 
 describe('QuizService', () => {
   let service: QuizService
+  let userService: UserService
+
+  const userDto = {
+    name: name.findName(),
+    email: internet.email(),
+    password: internet.password(10),
+  }
 
   const quizDto = {
     question: 'What year was JavaScript released?',
@@ -24,11 +35,17 @@ describe('QuizService', () => {
           { name: 'Quiz', schema: QuizSchema },
           { name: 'User', schema: UserSchema },
         ]),
+        UserModule,
       ],
       providers: [QuizService],
     }).compile()
 
     service = module.get<QuizService>(QuizService)
+    userService = module.get<UserService>(UserService)
+  })
+
+  afterAll(async () => {
+    await userService.delete(quizDto.createdBy)
   })
 
   it('should be defined', () => {
@@ -36,10 +53,28 @@ describe('QuizService', () => {
   })
 
   describe('#create', () => {
-    it('should not create Quiz with falsy params', async () => {
-      expect.assertions(6)
+    it('should not create a quiz if the User does not exist', async () => {
+      expect.assertions(3)
       try {
-        await service.create(null)
+        await service.create(quizDto)
+      } catch (error) {
+        error = error as UnauthorizedException
+        expect(error.name).toEqual('UnauthorizedException')
+        expect(error.response).not.toBeNull()
+        expect(error.response.statusCode).toBe(401)
+      }
+    })
+
+    it('should not create Quiz with falsy params', async () => {
+      expect.assertions(7)
+
+      const userId = await userService.create(userDto)
+      expect(userId).not.toBeNull()
+
+      quizDto.createdBy = userId.toString()
+
+      try {
+        await service.create({ createdBy: userId } as any)
       } catch (error) {
         error = error as Error
         expect(error.name).toEqual('ValidationError')
@@ -56,31 +91,31 @@ describe('QuizService', () => {
       expect(quiz).not.toBeNull()
       expect(quiz.question).toEqual(quizDto.question)
     })
+  })
 
-    it('should find Quizzes by creator id', async () => {
-      const quizzes = await service.findAllByUser(quizDto.createdBy)
-      expect(quizzes).not.toBeNull()
-      expect(quizzes[0]).not.toBeNull()
-      expect(quizzes[0].question).toEqual(quizDto.question)
-    })
+  it('should find Quizzes by creator id', async () => {
+    const quizzes = await service.findAllByUser(quizDto.createdBy)
+    expect(quizzes).not.toBeNull()
+    expect(quizzes[0]).not.toBeNull()
+    expect(quizzes[0].question).toEqual(quizDto.question)
+  })
 
-    it('should find Quiz by id', async () => {
-      const quizzes = await service.findAllByUser(quizDto.createdBy)
-      expect(quizzes).not.toBeNull()
-      expect(quizzes[0]).not.toBeNull()
+  it('should find Quiz by id', async () => {
+    const quizzes = await service.findAllByUser(quizDto.createdBy)
+    expect(quizzes).not.toBeNull()
+    expect(quizzes[0]).not.toBeNull()
 
-      const quiz = await service.findById(quizzes[0]._id)
-      expect(quiz).not.toBeNull()
-      expect(quiz.question).toEqual(quizDto.question)
-    })
+    const quiz = await service.findById(quizzes[0]._id)
+    expect(quiz).not.toBeNull()
+    expect(quiz.question).toEqual(quizDto.question)
+  })
 
-    it('should delete Quiz', async () => {
-      const quizzes = await service.findAllByUser(quizDto.createdBy)
-      expect(quizzes).not.toBeNull()
-      expect(quizzes[0]).not.toBeNull()
+  it('should delete Quiz', async () => {
+    const quizzes = await service.findAllByUser(quizDto.createdBy)
+    expect(quizzes).not.toBeNull()
+    expect(quizzes[0]).not.toBeNull()
 
-      const res = await service.delete(quizzes[0]._id, quizDto.createdBy)
-      expect(res.deletedCount).toBe(1)
-    })
+    const res = await service.delete(quizzes[0]._id, quizDto.createdBy)
+    expect(res.deletedCount).toBe(1)
   })
 })
