@@ -1,7 +1,15 @@
-import { Body, Controller, Post, Request } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  NotFoundException,
+  Param,
+  Post,
+  Request,
+} from '@nestjs/common'
 
 import { QuizService } from './quiz.service'
-import { CreateQuizDto } from './quiz.dto'
+import { CreateQuizDto, DeleteQuizDto } from './quiz.dto'
 
 @Controller('quiz')
 export class QuizController {
@@ -24,5 +32,14 @@ export class QuizController {
         __v: quiz.__v,
       },
     }
+  }
+
+  @Delete(':id')
+  async delete(@Param() { id }: DeleteQuizDto, @Request() req: any) {
+    const result = await this.service.delete(id, req.user.id)
+
+    if (result.deletedCount === 0) throw new NotFoundException('Quiz not found')
+
+    return { message: 'Quiz deleted successfully' }
   }
 }

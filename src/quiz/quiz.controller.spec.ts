@@ -15,6 +15,8 @@ describe('QuizController', () => {
   let controller: QuizController
   let userService: UserService
 
+  let quizId: string
+
   const userDto = {
     name: name.findName(),
     email: internet.email(),
@@ -70,7 +72,21 @@ describe('QuizController', () => {
       const quiz = await controller.create(quizDto, { user: { id: userId } })
       expect(quiz).not.toBeNull()
       expect(quiz.message).toEqual('Quiz created successfully')
+      expect(quiz.quiz._id).not.toBeNull()
+      quizId = quiz.quiz._id
       expect(quiz.quiz.question).toEqual(quizDto.question)
     })
+  })
+
+  it('should delete Quiz', async () => {
+    expect(quizId).not.toBeNull()
+
+    const res = await controller.delete(
+      { id: quizId },
+      { user: { id: quizDto.createdBy } },
+    )
+
+    expect(res).not.toBeNull()
+    expect(res.message).toEqual('Quiz deleted successfully')
   })
 })
