@@ -1,7 +1,8 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common'
-import { MongooseModule } from '@nestjs/mongoose'
-import { Test, TestingModule } from '@nestjs/testing'
 import { Types } from 'mongoose'
+import { MongooseModule } from '@nestjs/mongoose'
+import { internet, name } from 'faker'
+import { Test, TestingModule } from '@nestjs/testing'
+import { BadRequestException, NotFoundException } from '@nestjs/common'
 
 import { UserController } from './user.controller'
 import { UserSchema } from './user.schema'
@@ -10,7 +11,12 @@ import { UserService } from './user.service'
 describe('UserController', () => {
   let controller: UserController
   let userService: UserService
-  const userDto = { name: 'Test', email: 'test@test.com', password: '12345678' }
+
+  const userDto = {
+    name: name.findName(),
+    email: internet.email(),
+    password: internet.password(10),
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

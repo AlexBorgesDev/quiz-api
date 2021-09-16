@@ -1,6 +1,7 @@
 import { Error } from 'mongoose'
 import { compareSync } from 'bcryptjs'
 import { MongooseModule } from '@nestjs/mongoose'
+import { internet, name } from 'faker'
 import { Test, TestingModule } from '@nestjs/testing'
 
 import { UserSchema } from './user.schema'
@@ -8,7 +9,12 @@ import { UserService } from './user.service'
 
 describe('UserService', () => {
   let service: UserService
-  const userDto = { name: 'Test', email: 'test@test.com', password: '12345678' }
+
+  const userDto = {
+    name: name.findName(),
+    email: internet.email(),
+    password: internet.password(10),
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
