@@ -28,3 +28,8 @@ export class CreateQuizDto {
   @IsPositive()
   correctAlternative: number
 }
+
+export class DeleteQuizDto {
+  @IsMongoId()
+  id: string | Schema.Types.ObjectId
+}
