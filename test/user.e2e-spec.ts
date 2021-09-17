@@ -3,9 +3,9 @@ import * as request from 'supertest'
 import { internet, name } from 'faker'
 import { JwtService } from '@nestjs/jwt'
 import { MongooseModule } from '@nestjs/mongoose'
-import { INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { INestApplication, ValidationPipe } from '@nestjs/common'
 
 import { UserService } from '../src/user/user.service'
 
@@ -44,10 +44,16 @@ describe('UserController (e2e)', () => {
     jwtService = moduleFixture.get<JwtService>(JwtService)
     service = moduleFixture.get<UserService>(UserService)
     app = moduleFixture.createNestApplication()
+
+    app.useGlobalPipes(new ValidationPipe())
     await app.init()
   })
 
   describe('/user (POST)', () => {
+    it('should not create a User when the data is invalid', () => {
+      return request(app.getHttpServer()).post('/user').expect(400)
+    })
+
     it('should create User', () => {
       return request(app.getHttpServer())
         .post('/user')
