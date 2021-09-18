@@ -91,7 +91,6 @@ describe('QuizService', () => {
         expect(error.errors.question).not.toBeNull()
         expect(error.errors.alternatives).not.toBeNull()
         expect(error.errors.correctAlternative).not.toBeNull()
-        expect(error.errors.createdBy).not.toBeNull()
       }
     })
 
