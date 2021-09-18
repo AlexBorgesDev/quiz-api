@@ -63,6 +63,7 @@ describe('QuizController', () => {
 
   describe('#create', () => {
     it('should not create a Quiz if the User does not exist', async () => {
+      expect.assertions(3)
       try {
         await controller.create(quizDto, { user: { id: quizDto.createdBy } })
       } catch (error) {
