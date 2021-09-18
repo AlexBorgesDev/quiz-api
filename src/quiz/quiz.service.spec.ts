@@ -75,7 +75,7 @@ describe('QuizService', () => {
     })
 
     it('should not create Quiz with falsy params', async () => {
-      expect.assertions(7)
+      expect.assertions(6)
 
       const userId = await userService.create(userDto)
       expect(userId).not.toBeNull()
