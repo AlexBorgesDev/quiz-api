@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { UserModule } from './user/user.module'
 import { AuthModule } from './auth/auth.module'
 import { QuizModule } from './quiz/quiz.module'
+import { CollectionModule } from './collection/collection.module'
+
 import { JwtAuthGuard } from './auth/jwt.auth-guard'
 import { validationSchema } from './config/validation'
 
@@ -22,6 +24,7 @@ import { validationSchema } from './config/validation'
     UserModule,
     AuthModule,
     QuizModule,
+    CollectionModule,
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
